@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title id="head">Time Note</title>
+	<meta charset="utf-8">
+	<meta name="color-scheme" content="dark light">
+	<meta name="author" content="https://orcid.org/0009-0001-0977-2029">
+</head>
+
+<body id="note" contenteditable="plaintext-only" style="font-family:Courier,monospace; line-height:1.4; padding:4em;">
+	<br>
+	<div contenteditable="false" style="position: fixed; top:1em; right:1em;">
+		<a id="export" target="_blank" href="data:,your_text_here" style="color:CanvasText;"></a>
+	</div>
+	<div id="time" contenteditable="false" style="position:fixed; bottom:1em; right:1em;"></div>
+	<script>
+		const note = document.getElementById("note");
+		const link = document.getElementById("export");
+		const time = document.getElementById("time");
+		const head = document.getElementById("head");
+		note.focus();
+		const queryParams = new URLSearchParams(window.location.search);
+		const timeExp = queryParams.get('u') ?? 0;
+		const updatePage = function () {
+			time.innerText = (new Date().getTime() / 1000 >> timeExp).toString(16);
+			const titleEnd = note.innerText.indexOf('\n');
+			if (titleEnd > 0) {
+				head.innerText = note.innerText.slice(0, titleEnd);
+			}
+		};
+		link.innerText = queryParams.get('s') ?? "save";
+		link.addEventListener("click", function () {
+			link.href = encodeURI("data:text/plain;charset=UTF-8," + note.innerText.slice(0, -(link.innerText.length + time.innerText.length + 2)));
+			updatePage();
+		});
+		time.addEventListener("click", updatePage);
+		updatePage();
+	</script>
+</body>
+
+</html>
